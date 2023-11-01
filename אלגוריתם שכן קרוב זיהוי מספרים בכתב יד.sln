@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "אלגוריתם שכן קרוב זיהוי מספרים בכתב יד", "אלגוריתם שכן קרוב זיהוי מספרים בכתב יד\אלגוריתם שכן קרוב זיהוי מספרים בכתב יד.csproj", "{C363A4A3-5EF8-4F38-9574-E566C0BC21A6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MLModel1_ConsoleApp1", "MLModel1_ConsoleApp1\MLModel1_ConsoleApp1.csproj", "{51E09F3F-39DC-4F27-B66A-7402FD05FD4B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C363A4A3-5EF8-4F38-9574-E566C0BC21A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C363A4A3-5EF8-4F38-9574-E566C0BC21A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C363A4A3-5EF8-4F38-9574-E566C0BC21A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C363A4A3-5EF8-4F38-9574-E566C0BC21A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51E09F3F-39DC-4F27-B66A-7402FD05FD4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51E09F3F-39DC-4F27-B66A-7402FD05FD4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51E09F3F-39DC-4F27-B66A-7402FD05FD4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51E09F3F-39DC-4F27-B66A-7402FD05FD4B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {46D39017-498A-4DD0-AD93-BFF8E771CF63}
+	EndGlobalSection
+EndGlobal
