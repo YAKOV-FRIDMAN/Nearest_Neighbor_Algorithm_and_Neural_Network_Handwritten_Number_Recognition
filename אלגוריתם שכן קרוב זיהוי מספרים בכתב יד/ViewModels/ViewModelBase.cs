@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.ViewModels
+namespace TestAi.ViewModels
 {
     [Serializable]
     public class ViewModelBase : INotifyPropertyChanged

@@ -1,7 +1,7 @@
-﻿<Application x:Class="אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.App"
+﻿<Application x:Class="TestAi.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד"
+             xmlns:local="clr-namespace:TestAi"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

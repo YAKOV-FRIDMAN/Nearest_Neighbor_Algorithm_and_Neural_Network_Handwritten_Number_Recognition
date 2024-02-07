@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Services
+namespace TestAi.Services
 {
     public class NeuralNetwork
     {
         private double[][][] weights;  // Weights for each neuron in each layer
+        private double[][] weightsTest;
         public event Action<double> TrainingProgressChanged;
 
         public void Train(List<Tuple<double[], int>> trainingData)
@@ -56,7 +57,7 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
                         }
                     }
 
-                    double trainingProgress = (double)(epoch + 1) / totalEpochs;
+                    double trainingProgress = (double)(epoch + 1) / 10;
                     TrainingProgressChanged?.Invoke(trainingProgress);
                 }
             }
@@ -98,6 +99,8 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
             return maxOutputIndex;  // This is the classification
         }
 
+       
+
         public async Task SaveModel(string filePath)
         {
             var json = JsonConvert.SerializeObject(weights);
@@ -108,6 +111,34 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
         {
             var json = await File.ReadAllTextAsync(filePath);
             weights = JsonConvert.DeserializeObject <double[][][]>(json);
+            ConvertModel();
+            //var json1 = JsonConvert.SerializeObject(weightsTest);
+           // await File.WriteAllTextAsync(@"C:\Users\User\source\repos\YAKOV-FRIDMAN\Nearest_Neighbor_Algorithm_and_Neural_Network_Handwritten_Number_Recognition\אלגוריתם שכן קרוב זיהוי מספרים בכתב יד\testmm.json", json1);
+        }
+
+        public void ConvertModel()
+        {
+            weightsTest = new double[10][];
+            for (int i = 0; i < weightsTest.GetLength(0); i++)
+                weightsTest[i] = new double[784];
+
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 784; j++)
+                {
+                    try
+                    {
+                        double m = (weights[0][i][j] + weights[1][i][j] + weights[2][i][j]) / 3;
+                        weightsTest[i][j] = m;
+                    }
+                    catch (Exception e)
+                    {
+
+                         
+                    }
+                  
+                }
+            }
         }
     }
 }

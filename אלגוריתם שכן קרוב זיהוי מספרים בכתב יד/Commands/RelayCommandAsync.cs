@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Commands
+namespace TestAi.Commands
 {
     public class RelayCommandAsync : ICommand
     {

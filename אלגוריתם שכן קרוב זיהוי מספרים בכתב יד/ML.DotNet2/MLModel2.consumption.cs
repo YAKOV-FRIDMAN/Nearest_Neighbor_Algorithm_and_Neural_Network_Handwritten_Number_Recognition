@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
+namespace TestAi
 {
     public partial class MLModel2
     {

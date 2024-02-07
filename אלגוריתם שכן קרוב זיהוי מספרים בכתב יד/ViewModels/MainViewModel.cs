@@ -17,11 +17,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Commands;
-using אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Models;
-using אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Services;
+using TestAi.Commands;
+using TestAi.Models;
+using TestAi.Services;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.ViewModels
+namespace TestAi.ViewModels
 {
     internal class MainViewModel : ViewModelBase
     {
@@ -159,7 +159,12 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
                             var res = knn.Classify(doubleArray);
                             var res1 = "enpt";
                             if (simpleANN != null)
+                            {
                                 res1 = simpleANN.Classify(doubleArray).ToString();
+                                var full = simpleANN.ClassifyWithProbabilities(doubleArray);
+                                var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
+                                MessageBox.Show(tt);
+                            }
                             ResultNumber = $"res1: {res} res2 {res1}";
                         })
                     });
@@ -210,24 +215,25 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
 
         private async Task LoadMoreExecute()
         {
+            await LOadImages();
             //await Task.Factory.StartNew(() =>
             //{
             //    SaveImages(LoadTrainingDataByte(lines), "C:\\Users\\yafridman\\Documents\\NumImages");
             //}, TaskCreationOptions.LongRunning);
             // await LOadImages();
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
-            {
-                var imageBytes = File.ReadAllBytes(openFileDialog.FileName);
-                MLModel2.ModelInput sampleData = new MLModel2.ModelInput()
-                {
-                    ImageSource = imageBytes,
-                };
-
-                //Load model and predict output
-                var result = MLModel2.Predict(sampleData);
-                ResultNumber = result.PredictedLabel.ToString();
-            }
+            //OpenFileDialog openFileDialog = new OpenFileDialog();
+            //if (openFileDialog.ShowDialog() == true)
+            //{
+            //    var imageBytes = File.ReadAllBytes(openFileDialog.FileName);
+            //    MLModel2.ModelInput sampleData = new MLModel2.ModelInput()
+            //    {
+            //        ImageSource = imageBytes,
+            //    };
+            //
+            //    //Load model and predict output
+            //    var result = MLModel2.Predict(sampleData);
+            //    ResultNumber = result.PredictedLabel.ToString();
+            //}
         }
 
         private async Task SelectFileExecute()
@@ -387,7 +393,12 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
                                     var res = knn.Classify(doubleArray);
                                     var res1 = "enpt";
                                     if (simpleANN != null)
+                                    {
                                         res1 = simpleANN.Classify(doubleArray).ToString();
+                                        var full = simpleANN.ClassifyWithProbabilities(doubleArray);
+                                        var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
+                                        MessageBox.Show(tt);
+                                    }
                                     var res2 = "";
 
                                     if (neuralNetwork != null)
@@ -490,7 +501,12 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
                             var res = knn.Classify(doubleArray);
                             var res1 = "enpt";
                             if (simpleANN != null)
+                            {
                                 res1 = simpleANN.Classify(doubleArray).ToString();
+                                var full = simpleANN.ClassifyWithProbabilities(doubleArray);
+                                var tt = string.Join("\n", full.ToList().Select(_=> $"Key {_.Key} - value {_.Value}"));
+                                MessageBox.Show(tt);
+                            }
                             var res2 = "";
                             if (neuralNetwork != null)
                             {
@@ -507,6 +523,9 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
                 if (simpleANN != null)
                 {
                     res1 = simpleANN.Classify(doubleArray).ToString();
+                    var full = simpleANN.ClassifyWithProbabilities(doubleArray);
+                    var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
+                    MessageBox.Show(tt);
                     var resImg = simpleANN.GenerateImage(doubleArray);
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -520,7 +539,12 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
                                 var res = knn.Classify(doubleArray);
                                 var res1 = "enpt";
                                 if (simpleANN != null)
+                                {
                                     res1 = simpleANN.Classify(doubleArray).ToString();
+                                    var full = simpleANN.ClassifyWithProbabilities(doubleArray);
+                                    var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
+                                    MessageBox.Show(tt);
+                                }
                                 var res2 = "";
                                 if (neuralNetwork != null)
                                 {

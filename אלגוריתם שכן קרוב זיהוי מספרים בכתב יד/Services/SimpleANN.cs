@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Services
+namespace TestAi.Services
 {
     public class SimpleANN
     {
@@ -73,7 +73,49 @@ namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
 
             return bestLabel;
         }
-      
+
+        public Dictionary<int, double> ClassifyWithProbabilities(double[] newDataPoint)
+        {
+            Dictionary<int, double> probabilities = new Dictionary<int, double>();
+            double[] outputs = new double[10];
+            double sumExpOutputs = 0;
+
+            // חישוב הפלטים עבור כל נוירון
+            for (int i = 0; i < 10; i++)
+            {
+                double output = 0;
+                for (int j = 0; j < newDataPoint.Length; j++)
+                {
+                    output += weights[i][j] * newDataPoint[j];
+                }
+                outputs[i] = output;
+            }
+
+            // מציאת הערך המקסימלי לצורך נרמול
+            double maxOutput = outputs.Max();
+
+            // חישוב exp(output - maxOutput) וסכום כל ה-exp לצורך נרמול
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    double expOutput = Math.Exp(outputs[i] - maxOutput);
+            //    sumExpOutputs += expOutput;
+            //    outputs[i] = expOutput; // עדכון הפלט להצגה נכונה
+            //}
+
+            // חישוב ההסתברויות על ידי חלוקת כל exp(output) בסכום
+            for (int i = 0; i < 10; i++)
+            {
+                //probabilities[i] = (outputs[i] / sumExpOutputs) * 100; // המרה לאחוזים
+                probabilities[i] = outputs[i] ; // המרה לאחוזים
+            }
+
+            return probabilities;
+        }
+
+
+
+
+
         public byte[] GenerateImage(double[] newDataPoint, int width = 28, int height = 28)
         {
             int label = Classify(newDataPoint);  // Classify the new data point to find the relevant neuron

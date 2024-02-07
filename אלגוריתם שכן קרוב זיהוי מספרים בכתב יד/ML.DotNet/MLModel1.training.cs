@@ -10,7 +10,7 @@ using Microsoft.ML.Trainers;
 using Microsoft.ML.Transforms;
 using Microsoft.ML;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
+namespace TestAi
 {
     public partial class MLModel1
     {

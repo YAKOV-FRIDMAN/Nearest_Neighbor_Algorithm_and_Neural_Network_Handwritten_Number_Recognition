@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Commands;
+using TestAi.Commands;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Models
+namespace TestAi.Models
 {
     internal class ImageModel
     {

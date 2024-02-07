@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
+namespace TestAi
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

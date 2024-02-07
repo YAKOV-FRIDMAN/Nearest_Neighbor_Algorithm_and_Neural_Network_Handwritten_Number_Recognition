@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד.Services
+namespace TestAi.Services
 {
     public class KnnDigitRecognizer
     {

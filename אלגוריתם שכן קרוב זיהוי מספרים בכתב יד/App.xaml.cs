@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
+namespace TestAi
 {
     /// <summary>
     /// Interaction logic for App.xaml

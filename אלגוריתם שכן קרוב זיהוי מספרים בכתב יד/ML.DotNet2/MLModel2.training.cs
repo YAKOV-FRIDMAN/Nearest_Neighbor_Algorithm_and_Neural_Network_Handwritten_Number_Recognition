@@ -8,7 +8,7 @@ using Microsoft.ML.Data;
 using Microsoft.ML.Vision;
 using Microsoft.ML;
 
-namespace אלגוריתם_שכן_קרוב_זיהוי_מספרים_בכתב_יד
+namespace TestAi
 {
     public partial class MLModel2
     {
