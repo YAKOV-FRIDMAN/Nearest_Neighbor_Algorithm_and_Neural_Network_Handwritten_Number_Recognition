@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +12,8 @@ namespace TestAi.Services
     {
         private List<double[][]> weights; // List of layers, with 2D array for each layer's weights
         double learningRate = 0.01; // קצב למידה
+        public event Action<double> TrainingProgressChanged;
+
         public DeepNeuralNetwork(int inputSize, int[] layerSizes)
         {
             var rnd = new Random();
@@ -55,6 +59,8 @@ namespace TestAi.Services
 
                     // Weights update
                     UpdateWeights(gradients, layerOutputs);
+                    double trainingProgress = (double)(epoch + 1) / 10;
+                    TrainingProgressChanged?.Invoke(trainingProgress);
                 }
             }
         }
@@ -78,6 +84,7 @@ namespace TestAi.Services
                         weights[layer][neuron][weightIndex] -= learningRate * gradient * input;
                     }
                 }
+              
             }
         }
 
@@ -181,6 +188,19 @@ namespace TestAi.Services
             // Assuming the last layer is for classification and has one neuron per class
             int maxIndex = Array.IndexOf(output, output.Max());
             return maxIndex; // Index of the highest output value corresponds to the class
+        }
+
+        public async Task SaveModel(string filePath)
+        {
+            var json = JsonConvert.SerializeObject(weights);
+            await File.WriteAllTextAsync(filePath, json);
+        }
+
+        public async Task LoadModel(string filePath)
+        {
+            var json = await File.ReadAllTextAsync(filePath);
+            weights = JsonConvert.DeserializeObject<List<double[][]>>(json);
+         
         }
     }
 

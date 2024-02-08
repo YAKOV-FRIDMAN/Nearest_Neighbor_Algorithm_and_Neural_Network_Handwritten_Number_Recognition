@@ -13,9 +13,17 @@ namespace TestAi.Services
         private double[][][] weights;  // Weights for each neuron in each layer
         private double[][] weightsTest;
         public event Action<double> TrainingProgressChanged;
-
+        DeepNeuralNetwork deepNeuralNetwor;
+        public NeuralNetwork()
+        {
+            deepNeuralNetwor = new DeepNeuralNetwork(784, new int[] { 10, 10, 10 });
+            deepNeuralNetwor.TrainingProgressChanged += (e) => { TrainingProgressChanged?.Invoke(e); }; 
+        }
         public void Train(List<Tuple<double[], int>> trainingData)
         {
+            deepNeuralNetwor.Train(trainingData);
+            return;
+            // deepNeuralNetwork.Train(trainingData);  
             // Initialize weights randomly
             var rnd = new Random();
             int numLayers = 3; // Example: 3 layers
@@ -65,6 +73,7 @@ namespace TestAi.Services
 
         public int Classify(double[] newDataPoint)
         {
+            return   deepNeuralNetwor.Classify(newDataPoint);    
             int numLayers = weights.Length;
             int neuronsPerLayer = weights[0].Length;
 
@@ -103,12 +112,16 @@ namespace TestAi.Services
 
         public async Task SaveModel(string filePath)
         {
+            deepNeuralNetwor.SaveModel(filePath);
+            return;
             var json = JsonConvert.SerializeObject(weights);
             await File.WriteAllTextAsync(filePath, json);
         }
 
         public async Task LoadModel(string filePath)
         {
+            deepNeuralNetwor.LoadModel(filePath);
+            return;
             var json = await File.ReadAllTextAsync(filePath);
             weights = JsonConvert.DeserializeObject <double[][][]>(json);
             ConvertModel();
