@@ -182,7 +182,10 @@ The application expects CSV files with the following format:
 label,pixel0,pixel1,pixel2,...,pixel783
 5,0,0,0,...,0
 0,0,0,0,...,0
+4,0,0,0,...,0
 ```
+
+**Note:** The file must include a header row (first line shown above).
 
 - First column: digit label (0-9)
 - Remaining 784 columns: pixel values (0-255) for 28x28 image
