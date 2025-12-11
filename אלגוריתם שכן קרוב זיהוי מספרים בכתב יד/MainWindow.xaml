@@ -14,7 +14,7 @@
     <Grid>
         <Grid.RowDefinitions>
 
-            <RowDefinition Height="130"/>
+            <RowDefinition Height="155"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
@@ -38,9 +38,24 @@
                 <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"   />
             </DockPanel>
             <DockPanel  Margin="5"  Height="20"  >
+                <Button  Content="Load CNN File model" Command="{Binding LoadCNNModelFile}"/>
+                <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"   />
+            </DockPanel>
+            <DockPanel  Margin="5"  Height="20"  >
                 <Button  Content="Generator" Command="{Binding Generator}"/>
                 <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Text="{Binding NumberToGenerator}" Width="100" />
                 <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Text="{Binding Threshold}" Margin="10,0,0,0" />
+            </DockPanel>
+            
+            <DockPanel Margin="5" Height="20">
+                <CheckBox Content="Use NVIDIA GPU (CUDA)" 
+                          IsChecked="{Binding UseGpu}" 
+                          IsEnabled="{Binding IsGpuAvailable}"
+                          VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding IsGpuAvailable, StringFormat='(Available: {0})'}" 
+                           Margin="10,0,0,0" 
+                           VerticalAlignment="Center"
+                           Foreground="Gray"/>
             </DockPanel>
 
         </StackPanel>
@@ -75,8 +90,9 @@
         <Button Grid.Row="2" Command="{Binding LoadMore}" HorizontalAlignment="Left"  Content="Load More.." Margin="5"/>
         <TextBlock Grid.Row="2" VerticalAlignment="Center"  Text="{Binding Images.Count}" HorizontalAlignment="Center"/>
 
-        <Grid  Grid.Column="1" Grid.Row="0">
+        <Grid x:Name="gridTarin" Grid.Column="1" Grid.Row="0">
             <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -103,6 +119,18 @@
                 <TextBlock Text="{Binding TrainingProgress1}" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <ProgressBar Grid.Column="1" VerticalAlignment="Center" Height="40" Value="{Binding TrainingProgress1}" Maximum="100"/>
                 <Button Content="Save To File 1" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding SaveANNModelToFile1}"/>
+            </Grid>
+            <Grid   Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition  Width="30"/>
+                    <ColumnDefinition  Width="80"/>
+                </Grid.ColumnDefinitions>
+                <Button  Content="Train CNN model" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding TrainCNNModel}" />
+                <TextBlock Text="{Binding TrainingProgress2}" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <ProgressBar Grid.Column="1" VerticalAlignment="Center" Height="40" Value="{Binding TrainingProgress2}" Maximum="100"/>
+                <Button Content="Save To File 2" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding SaveCNNModelToFile}"/>
             </Grid>
         </Grid>
       

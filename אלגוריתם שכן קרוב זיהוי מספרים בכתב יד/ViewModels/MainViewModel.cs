@@ -30,10 +30,13 @@ namespace TestAi.ViewModels
         public RelayCommandAsync LoadMore { get; set; }
         public RelayCommandAsync TraimANNModel { get; set; }
         public RelayCommandAsync TraimANNModel1 { get; set; }
+        public RelayCommandAsync TrainCNNModel { get; set; }
         public RelayCommandAsync SaveANNModelToFile { get; set; }
         public RelayCommandAsync SaveANNModelToFile1 { get; set; }
+        public RelayCommandAsync SaveCNNModelToFile { get; set; }
         public RelayCommandAsync loadANNModelFile { get; set; }
         public RelayCommandAsync loadANNModelFile1 { get; set; }
+        public RelayCommandAsync LoadCNNModelFile { get; set; }
         public RelayCommandAsync Generator { get; set; }
         private string[] lines;
         private string fileLocation;
@@ -64,6 +67,13 @@ namespace TestAi.ViewModels
             get { return trainingProgress1; }
             set { trainingProgress1 = value; OnPropertyChanged(); }
         }
+        private double trainingProgress2;
+
+        public double TrainingProgress2
+        {
+            get { return trainingProgress2; }
+            set { trainingProgress2 = value; OnPropertyChanged(); }
+        }
         private int numberToGenerator;
 
         public int NumberToGenerator
@@ -79,27 +89,61 @@ namespace TestAi.ViewModels
             set { threshold = value; OnPropertyChanged(); }
         }
 
+        private bool _useGpu;
+        public bool UseGpu
+        {
+            get { return _useGpu; }
+            set 
+            { 
+                _useGpu = value; 
+                if (neuralNetwork != null) neuralNetwork.UseGpu = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        private string _isGpuAvailable;
+        public string IsGpuAvailable
+        {
+            get { return _isGpuAvailable; }
+            set { _isGpuAvailable = value; OnPropertyChanged(); }
+        }
+
         private KnnDigitRecognizer knn;
         SimpleANN simpleANN;
         NeuralNetwork neuralNetwork;
+        ConvolutionalNeuralNetwork cnn;
 
         public MainViewModel()
         {
             SelectFile = new RelayCommandAsync(SelectFileExecute);
             LoadMore = new RelayCommandAsync(LoadMoreExecute);
             TraimANNModel = new RelayCommandAsync(TraimANNModelExecute);
+            TrainCNNModel = new RelayCommandAsync(TrainCNNModelExecute);
             SaveANNModelToFile = new RelayCommandAsync(SaveANNModelToFileExecute);
             loadANNModelFile = new RelayCommandAsync(loadANNModelFileExecute);
+            SaveCNNModelToFile = new RelayCommandAsync(SaveCNNModelToFileExecute);
+            LoadCNNModelFile = new RelayCommandAsync(LoadCNNModelFileExecute);
             Generator = new RelayCommandAsync(GeneratorExecute);
             Threshold = 101;
             TraimANNModel1 = new RelayCommandAsync(TraimANNModel1rExecute);
             SaveANNModelToFile1 = new RelayCommandAsync(SaveANNModelToFile1Execute);
             loadANNModelFile1 = new RelayCommandAsync(loadANNModelFile1Execute);
+
+            // Check for GPU availability
+            try
+            {
+                IsGpuAvailable = $"{DeepNeuralNetwork.IsCudaAvailable()} - {DeepNeuralNetwork.GetAcceleratorName()}";
+            }
+            catch
+            {
+                IsGpuAvailable = false.ToString();
+            }
         }
 
         private async Task loadANNModelFile1Execute()
         {
             neuralNetwork = new NeuralNetwork();
+            neuralNetwork.UseGpu = UseGpu; // Apply current setting
 
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
@@ -119,6 +163,34 @@ namespace TestAi.ViewModels
                 }
             }
         }
+
+        private async Task SaveCNNModelToFileExecute()
+        {
+            if (cnn != null)
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    await cnn.SaveModel(saveFileDialog.FileName + ".json");
+                }
+            }
+        }
+
+        private async Task LoadCNNModelFileExecute()
+        {
+            cnn = new ConvolutionalNeuralNetwork();
+            cnn.TrainingProgressChanged += (progress) =>
+            {
+                TrainingProgress2 = progress;
+            };
+
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                await cnn.LoadModel(openFileDialog.FileName);
+            }
+        }
+
         private async Task TraimANNModel1rExecute()
         {
             if (trainingData != null)
@@ -126,11 +198,30 @@ namespace TestAi.ViewModels
                 await Task.Factory.StartNew(() =>
                 {
                     neuralNetwork = new NeuralNetwork();
+                    neuralNetwork.UseGpu = UseGpu; // Apply current setting
                     neuralNetwork.TrainingProgressChanged += (e) =>
                     {
                         TrainingProgress1 = e;
                     };
                     neuralNetwork.Train(trainingData);
+                }, TaskCreationOptions.LongRunning);
+            }
+        }
+
+        private async Task TrainCNNModelExecute()
+        {
+            if (trainingData != null)
+            {
+                await Task.Factory.StartNew(() =>
+                {
+                    cnn = new ConvolutionalNeuralNetwork();
+                    cnn.TrainingProgressChanged += (progress) =>
+                    {
+                        TrainingProgress2 = progress;
+                    };
+                    TrainingProgress2 = 0;
+                    cnn.Train(trainingData, 5, 32);
+                    TrainingProgress2 = 100;
                 }, TaskCreationOptions.LongRunning);
             }
         }
@@ -163,9 +254,14 @@ namespace TestAi.ViewModels
                                 res1 = simpleANN.Classify(doubleArray).ToString();
                                 var full = simpleANN.ClassifyWithProbabilities(doubleArray);
                                 var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
-                                MessageBox.Show(tt);
+                                //MessageBox.Show(tt);
                             }
-                            ResultNumber = $"res1: {res} res2 {res1}";
+                            var res3 = "";
+                            if (cnn != null)
+                            {
+                                res3 = "CNN: " + cnn.Classify(doubleArray).ToString();
+                            }
+                            ResultNumber = $"res1: {res} res2 {res1} {res3}";
                         })
                     });
                 });
@@ -397,7 +493,7 @@ namespace TestAi.ViewModels
                                         res1 = simpleANN.Classify(doubleArray).ToString();
                                         var full = simpleANN.ClassifyWithProbabilities(doubleArray);
                                         var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
-                                        MessageBox.Show(tt);
+                                        //MessageBox.Show(tt);
                                     }
                                     var res2 = "";
 
@@ -405,10 +501,15 @@ namespace TestAi.ViewModels
                                     {
                                         res2 = "NN Model 2: " + neuralNetwork.Classify(doubleArray).ToString();
                                     }
-                                    var res3 = "Microsoft Model 1: " + MLModel(pixels);
+                                    var res3 = "";
+                                    if (cnn != null)
+                                    {
+                                        res3 = "CNN: " + cnn.Classify(doubleArray).ToString();
+                                    }
+                                    //var res3 = "Microsoft Model 1: " + MLModel(pixels);
 
-                                    var res4 = "Microsoft Model 2: " + MlModel2(bitmap);
-                                    ResultNumber = $"Knn Model: {res} | NN Model 1 : {res1} {res2} | {res3} | {res4}";
+                                    //var res4 = "Microsoft Model 2: " + MlModel2(bitmap);
+                                    ResultNumber = $"Knn Model: {res} | NN Model 1 : {res1} {res2} {res3}";
                                 })
                             });
                         });
@@ -467,69 +568,35 @@ namespace TestAi.ViewModels
                 }
             }
 
-
-            if (knn != null)
+            try
             {
-                // double[] doubleArray = pixelData.Select(b => (double)b).ToArray();
-                var pixelsDouble = new double[28 * 28];
-                for (int i = 0; i < 28 * 28; i++)
-                {
-                    int byteIndex = i * 4;
-                    pixelsDouble[i] = pixelData[byteIndex + 2] / 255.0;
-                }
-
-                var bytes = ConvertToOnePixel(pixelArray2D, 0);
-                double[] doubleArray = bytes.Select(b => (double)b).ToArray();
 
 
-                Application.Current.Dispatcher.Invoke(() =>
+
+                if (knn != null)
                 {
-                    BitmapSource invertedBitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, bytes, 28);
-                    Images.Add(new ImageModel() { ImageData = invertedBitmap, Key = 0 });
-                });
-                var res = knn.Classify(doubleArray);
-                var resimg = knn.GenerateDigit(doubleArray);
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    BitmapSource invertedBitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, resimg, 28);
-                    Images.Add(new ImageModel()
+                    // double[] doubleArray = pixelData.Select(b => (double)b).ToArray();
+                    var pixelsDouble = new double[28 * 28];
+                    for (int i = 0; i < 28 * 28; i++)
                     {
-                        ImageData = invertedBitmap,
-                        Key = 0,
-                        Classify = new RelayCommandAsync(async () =>
-                        {
-                            var res = knn.Classify(doubleArray);
-                            var res1 = "enpt";
-                            if (simpleANN != null)
-                            {
-                                res1 = simpleANN.Classify(doubleArray).ToString();
-                                var full = simpleANN.ClassifyWithProbabilities(doubleArray);
-                                var tt = string.Join("\n", full.ToList().Select(_=> $"Key {_.Key} - value {_.Value}"));
-                                MessageBox.Show(tt);
-                            }
-                            var res2 = "";
-                            if (neuralNetwork != null)
-                            {
-                                res2 = "NN Model 2: " + neuralNetwork.Classify(doubleArray).ToString();
-                            }
-                            var res3 = "Microsoft Model 1: " + MLModel(bytes);
+                        int byteIndex = i * 4;
+                        pixelsDouble[i] = pixelData[byteIndex + 2] / 255.0;
+                    }
 
-                            var res4 = "Microsoft Model 2: " + MlModel2(invertedBitmap);
-                            ResultNumber = $"Knn Model: {res} | NN Model 1 : {res1} | {res2} | {res3} | {res4}";
-                        })
-                    });
-                });
-                var res1 = "enpt";
-                if (simpleANN != null)
-                {
-                    res1 = simpleANN.Classify(doubleArray).ToString();
-                    var full = simpleANN.ClassifyWithProbabilities(doubleArray);
-                    var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
-                    MessageBox.Show(tt);
-                    var resImg = simpleANN.GenerateImage(doubleArray);
+                    var bytes = ConvertToOnePixel(pixelArray2D, 0);
+                    double[] doubleArray = bytes.Select(b => (double)b).ToArray();
+
+
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        BitmapSource invertedBitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, resImg, 28);
+                        BitmapSource invertedBitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, bytes, 28);
+                        Images.Add(new ImageModel() { ImageData = invertedBitmap, Key = 0 });
+                    });
+                    var res = knn.Classify(doubleArray);
+                    var resimg = knn.GenerateDigit(doubleArray);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        BitmapSource invertedBitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, resimg, 28);
                         Images.Add(new ImageModel()
                         {
                             ImageData = invertedBitmap,
@@ -543,31 +610,91 @@ namespace TestAi.ViewModels
                                     res1 = simpleANN.Classify(doubleArray).ToString();
                                     var full = simpleANN.ClassifyWithProbabilities(doubleArray);
                                     var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
-                                    MessageBox.Show(tt);
+                                    //MessageBox.Show(tt);
                                 }
                                 var res2 = "";
                                 if (neuralNetwork != null)
                                 {
                                     res2 = "NN Model 2: " + neuralNetwork.Classify(doubleArray).ToString();
                                 }
-                                var res3 = "Microsoft Model 1: " + MLModel(bytes);
+                                var res3 = "";
+                                if (cnn != null)
+                                {
+                                    res3 = "CNN: " + cnn.Classify(doubleArray).ToString();
+                                }
+                                //var res3 = "Microsoft Model 1: " + MLModel(bytes);
 
-                                var res4 = "Microsoft Model 2: " + MlModel2(invertedBitmap);
-                                ResultNumber = $"Knn Model: {res} | NN Model 1 : {res1}  | {res2} | {res3} | {res4}";
+                                //var res4 = "Microsoft Model 2: " + MlModel2(bitmap);
+                                ResultNumber = $"Knn Model: {res} | NN Model 1 : {res1} | {res2} | {res3}";
                             })
                         });
                     });
-                }
-                var res2 = "";
-                BitmapSource invertedBitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, resimg, 28);
-                if (neuralNetwork != null)
-                {
-                    res2 = "NN Model 2: " + neuralNetwork.Classify(doubleArray).ToString();
-                }
-                var res3 = "Microsoft Model 1: " + MLModel(bytes);
+                    var res1 = "enpt";
+                    if (simpleANN != null)
+                    {
+                        res1 = simpleANN.Classify(doubleArray).ToString();
+                        var full = simpleANN.ClassifyWithProbabilities(doubleArray);
+                        var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
+                        //MessageBox.Show(tt);
+                        var resImg = simpleANN.GenerateImage(doubleArray);
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            BitmapSource invertedBitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, resImg, 28);
+                            Images.Add(new ImageModel()
+                            {
+                                ImageData = invertedBitmap,
+                                Key = 0,
+                                Classify = new RelayCommandAsync(async () =>
+                                {
+                                    var res = knn.Classify(doubleArray);
+                                    var res1 = "enpt";
+                                    if (simpleANN != null)
+                                    {
+                                        res1 = simpleANN.Classify(doubleArray).ToString();
+                                        var full = simpleANN.ClassifyWithProbabilities(doubleArray);
+                                        var tt = string.Join("\n", full.ToList().Select(_ => $"Key {_.Key} - value {_.Value}"));
+                                        //MessageBox.Show(tt);
+                                    }
+                                    var res2 = "";
+                                    if (neuralNetwork != null)
+                                    {
+                                        res2 = "NN Model 2: " + neuralNetwork.Classify(doubleArray).ToString();
+                                    }
+                                    var res3 = "";
+                                    if (cnn != null)
+                                    {
+                                        res3 = "CNN: " + cnn.Classify(doubleArray).ToString();
+                                    }
+                                    //var res3 = "Microsoft Model 1: " + MLModel(bytes);
 
-                var res4 = "Microsoft Model 2: " + MlModel2(invertedBitmap);
-                ResultNumber = $"Knn Model: {res} | NN Model 1 : {res1} | {res2} | {res3} | {res4}";
+                                    //var res4 = "Microsoft Model 2: " + MlModel2(invertedBitmap);
+                                    ResultNumber = $"Knn Model: {res} | NN Model 1 : {res1}  | {res2} | {res3} ";
+                                })
+                            });
+                        });
+                    }
+                    var res2 = "";
+                    BitmapSource invertedBitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, resimg, 28);
+                    if (neuralNetwork != null)
+                    {
+                        res2 = "NN Model 2: " + neuralNetwork.Classify(doubleArray).ToString();
+                    }
+                    var res3 = "";
+                    if (cnn != null)
+                    {
+                        res3 = "CNN: " + cnn.Classify(doubleArray).ToString();
+                    }
+                    //var res3 = "Microsoft Model 1: " + MLModel(bytes);
+
+                    //var res4 = "Microsoft Model 2: " + MlModel2(invertedBitmap);
+                    ResultNumber = $"Knn Model: {res} | NN Model 1 : {res1} | {res2} | {res3} ";
+                }
+
+            }
+            catch (Exception e)
+            {
+
+                MessageBox.Show(e.ToString());
             }
         }
 

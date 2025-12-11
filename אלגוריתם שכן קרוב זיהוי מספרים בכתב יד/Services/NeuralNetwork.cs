@@ -16,9 +16,23 @@ namespace TestAi.Services
         DeepNeuralNetwork deepNeuralNetwor;
         public NeuralNetwork()
         {
-            deepNeuralNetwor = new DeepNeuralNetwork(784, new int[] { 10, 10, 10 });
+            // Updated architecture:
+            // Input: 784 (28x28 pixels)
+            // Hidden Layer 1: 128 neurons (good capacity for features)
+            // Hidden Layer 2: 64 neurons (refining features)
+            // Output Layer: 10 neurons (digits 0-9)
+            deepNeuralNetwor = new DeepNeuralNetwork(784, new int[] { 128, 64, 10 });
             deepNeuralNetwor.TrainingProgressChanged += (e) => { TrainingProgressChanged?.Invoke(e); }; 
         }
+
+        public bool UseGpu
+        {
+            get { return deepNeuralNetwor.UseGpu; }
+            set { deepNeuralNetwor.UseGpu = value; }
+        }
+
+        public bool IsCudaAvailable => DeepNeuralNetwork.IsCudaAvailable();
+
         public void Train(List<Tuple<double[], int>> trainingData)
         {
             deepNeuralNetwor.Train(trainingData);
