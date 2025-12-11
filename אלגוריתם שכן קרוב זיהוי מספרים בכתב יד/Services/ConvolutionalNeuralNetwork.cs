@@ -157,7 +157,7 @@ namespace TestAi.Services
                 OutBiases = outBiases
             };
 
-            var options = new JsonSerializerOptions { WriteIndented = true };
+            var options = new JsonSerializerOptions { WriteIndented = true }; 
             using (var stream = File.Create(filePath))
             {
                 await JsonSerializer.SerializeAsync(stream, modelData, options);
@@ -170,7 +170,7 @@ namespace TestAi.Services
                 throw new FileNotFoundException("Model file not found", filePath);
 
             using (var stream = File.OpenRead(filePath))
-            {
+            { 
                 var modelData = await JsonSerializer.DeserializeAsync<ModelData>(stream);
                 if (modelData != null)
                 {
