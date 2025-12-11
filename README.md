@@ -73,7 +73,7 @@ The application provides an interactive UI for drawing digits and testing the re
 
 ## 🛠️ Technologies
 
-- **.NET 8.0** - Application framework
+- **.NET 8.0 Windows** - Application framework (net8.0-windows7.0)
 - **WPF (Windows Presentation Foundation)** - User interface
 - **C#** - Programming language
 - **ML.NET** - Machine learning framework
@@ -203,7 +203,7 @@ dotnet run --project "אלגוריתם שכן קרוב זיהוי מספרים �
 
 ### Convolutional Neural Network (CNN)
 - Implemented from scratch without external ML frameworks
-- Architecture: Input (28x28) → Conv1 (8 filters, 3x3) → ReLU → MaxPool (2x2) → Conv2 (16 filters, 3x3) → ReLU → MaxPool (2x2) → Flatten → Dense (128) → ReLU → Output (10) → Softmax
+- Architecture: Input (28x28) → Conv1 (8x3x3 filters) → ReLU → MaxPool (2x2) → Conv2 (16x3x3 filters) → ReLU → MaxPool (2x2) → Flatten → Dense (128) → ReLU → Output (10) → Softmax
 - Uses convolution and max-pooling layers
 - Batch processing support
 - Adam optimizer for training
